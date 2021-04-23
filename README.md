@@ -22,7 +22,7 @@
 ### Ejecución
 - Con Github Desktop clonar el proyecto
     Link respositorio: https://github.com/FanGoH/proyecto-graficas
-- Apachurrar el boton azul que dice "Open with Visual Studio Code"
+- Presionar el boton azul que dice "Open with Visual Studio Code"
 - Una vez clonado el repositorio, abrir la terminal de Visual Studio Code.
 - Manera 1
     - Ejecutar el Comando `npm install`

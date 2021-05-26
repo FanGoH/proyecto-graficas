@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { ImageLoader, MeshPhongMaterial, Scene, TextureLoader } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-// import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-// import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import useWindowSize from "../Hooks/useWindowSize";
 import { SAMPLES } from "./SAMPLES";
 
@@ -17,7 +18,8 @@ export const TestComponent = () => {
 	const [currentFace, setCurrentFace] = useState<keyof typeof SAMPLES>(
 		"lego"
 	);
-
+	
+	var currentMesh: MeshPhongMaterial;
 	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
 		setColor(e.target.value);
 	};
@@ -42,18 +44,34 @@ export const TestComponent = () => {
 				SAMPLES[currentFace]
 			);
 		} else {
-			cubeRef.current!.material.map = new THREE.TextureLoader().load(
-				SAMPLES[currentFace]
-			);
+			
+			var material =new THREE.TextureLoader().load(SAMPLES[currentFace]);
+
+			
+			cubeRef.current!.material.map = material;
+			
 		}
 	};
-
+	
 	useEffect(() => {
 		if (divToMount.current === null) {
 			return;
 		}
 		// === THREE.JS CODE START ===
 		const scene = new THREE.Scene();
+		const loader = new THREE.CubeTextureLoader();
+		const texturess = loader.load([
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+		  ]);
+		scene.background = texturess;
+		  console.log(scene.background);
+		//esto lo acababa de ponder so, me di cuenta
+		
 		const camera = new THREE.PerspectiveCamera(
 			75,
 			window.innerWidth / window.innerHeight,
@@ -65,7 +83,7 @@ export const TestComponent = () => {
 
 		{
 			const skyColor = 0xb1e1ff;
-			const ground = 0xf5fffe;
+			const ground = 0xFF5733;
 			const intensity = 1.3;
 
 			const light = new THREE.HemisphereLight(
@@ -78,8 +96,8 @@ export const TestComponent = () => {
 		}
 
 		{
-			const COLOR = 0x888888;
-			const intsnity = 0.2;
+			const COLOR = 0xb1e1ff;
+			const intsnity = 20;
 			const light = new THREE.DirectionalLight(COLOR, intsnity);
 			light.position.set(0, 10, 0);
 			light.target.position.set(-5, 0, 0);
@@ -112,56 +130,85 @@ export const TestComponent = () => {
 		// });
 
 		// const firstCube = new THREE.Mesh(geometry, image);
-
+		var tex;
 		const materials = [];
 		for (let i = 0; i < 6; i++) {
 			const img = new Image();
 			img.src = `${process.env.PUBLIC_URL}/image/lego.jpg`;
-			const tex = new THREE.TextureLoader().load(img.src);
+			 tex = new THREE.TextureLoader().load(img.src);
 
 			const mat = new THREE.MeshBasicMaterial({
-				...(i !== 4 && { color: 0x00ff00 }),
+				...(i !== 4 && { color: 0xffffff }),
 				...(i === 4 && { map: tex }),
 			});
 			materials.push(mat);
 		}
+		renderer.physicallyCorrectLights = true;
+		const sgeometry = new THREE.SphereGeometry(1,60,60);
+		currentMesh = new THREE.MeshPhongMaterial();
+		var envgen =new THREE.PMREMGenerator(renderer);
+		
+		currentMesh.envMap = texturess;
+		currentMesh.combine = THREE.MixOperation;
+		currentMesh.reflectivity = 0.1;
+		currentMesh.shininess = 0;
+	
+		currentMesh.map = new TextureLoader().load(SAMPLES['lego'])
+		
 
-		const cube = new THREE.Mesh(geometry, materials);
+		const cube = new THREE.Mesh(sgeometry, currentMesh);
 		cube.rotation.set(0.5, 0.4, 0);
 		cubeRef.current = cube;
-
+		
+		renderer.setClearColor(0xFFFFFF,0);
+		console.log(cube)
 		scene.add(cube);
-
+	//	scene.background = new THREE.Color("white");
 		camera.position.z = 5;
 		const animate = () => {
 			requestAnimationFrame(animate);
 			// cube.rotation.x += 0.01;
 			// cube.rotation.y += 0.01;
 			renderer.render(scene, camera);
+			
 		};
 		animate();
+		
+		const loadModel = async () => {
+			var oloader = new OBJLoader();
+			const mtlLoad = new MTLLoader();
 
-		// const loadModel = async () => {
-		// 	var oloader = new OBJLoader();
-		// 	const mtlLoad = new MTLLoader();
+			const materials = await mtlLoad.loadAsync(
+				`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.mtl`
+			);
 
-		// 	const materials = await mtlLoad.loadAsync(
-		// 		`https://raw.githubusercontent.com/FanGoH/practica-2-frost-model/main/frosto/frost.mtl?token=ANJ27HY2LR65RKBZPLAEYWLAPW7OM`
-		// 	);
-		// 	materials.preload();
 
-		// 	oloader.setMaterials(materials);
+			materials.preload();
 
-		// 	const FROSTMODEL = await oloader.loadAsync(
-		// 		`https://raw.githubusercontent.com/FanGoH/practica-2-frost-model/main/frosto/frost.obj?token=ANJ27H6XROLMT7OEEE7JCBLAPW7KM`
-		// 	);
+			//oloader.setMaterials(materials);
+			var  texture = await new TextureLoader().loadAsync("https://d500.epimg.net/cincodias/imagenes/2018/11/13/lifestyle/1542113135_776401_1542116070_noticia_normal.jpg")
+			const FROSTMODEL = (await oloader.loadAsync(
+				`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.obj`))
+			
+				FROSTMODEL.traverse(function ( child ) {
 
-		// 	scene.add(FROSTMODEL);
+					if ( child instanceof THREE.Mesh ) {
+				
+						child.material.map = texture;
+						child.material.envMap = texturess;
+				
+					}
+				
+				} );
+			 
+			FROSTMODEL.scale.set(0.2,0.2,0.2);
+			
+			scene.add(FROSTMODEL );
 
-		// 	return [FROSTMODEL, materials];
-		// };
+			return [FROSTMODEL, materials];
+		};
 
-		// loadModel();
+		loadModel();
 
 		// === THREE.JS EXAMPLE CODE END ===
 	}, [renderer]);

@@ -4,6 +4,7 @@ import * as THREE from "three";
 // import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 // import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import useWindowSize from "../Hooks/useWindowSize";
+import { SAMPLES } from "./SAMPLES";
 
 // let FROSTMODEL: THREE.Object3D;
 
@@ -110,9 +111,10 @@ export const TestComponent = () => {
 			divToMount.current.appendChild(renderer.domElement);
 		}
 		const geometry = new THREE.BoxGeometry(1, 1, 1);
+		
 		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 		const cube = new THREE.Mesh(geometry, material);
-		scene.add(cube);
+		scene.add(cube	);
 		camera.position.z = 5;
 		const animate = () => {
 			requestAnimationFrame(animate);

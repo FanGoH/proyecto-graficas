@@ -10,5 +10,13 @@ export const MODELS = {
 	shirts:
 		"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/uploads_files_2488279_Top%2B13.obj",
     bottle:
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mirai.obj"
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mirai.obj",
+	frasco:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/oil_bottle_001.obj",
+	frasco2:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/Plastic%20Water%20Bottle%20Empty.obj",
+	pad:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mouse_pad.obj",
+	botellaChida:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/Plastic%20Water%20Bottle%20Full.obj"
 };

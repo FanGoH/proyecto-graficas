@@ -6,6 +6,7 @@ import {
 	MeshPhongMaterial,
 	Scene,
 	TextureLoader,
+	Vector3,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
@@ -14,10 +15,12 @@ import useWindowSize from "../Hooks/useWindowSize";
 import { SAMPLES } from "./SAMPLES";
 import { MODELS } from "./MODELS";
 
+
 export const TestComponent = () => {
 	const divToMount = useRef<HTMLDivElement>(null);
 	const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 	const cubeRef = useRef<THREE.Mesh<any, any> | null>(null);
+	
 	const [renderer] = useState<THREE.WebGLRenderer>(new THREE.WebGLRenderer());
 	const [width, height] = useWindowSize(140);
 	const [color, setColor] = useState("");
@@ -31,7 +34,7 @@ export const TestComponent = () => {
 		useState<keyof typeof SAMPLES>("lego");
 
 	const [currentMod, setCurrentModel] =
-		useState<keyof typeof MODELS>("bottle");
+		useState<keyof typeof MODELS>("botellaChida");
 
 	var currentMesh: MeshPhongMaterial;
 	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -63,21 +66,43 @@ export const TestComponent = () => {
 		materials.preload();
 
 		//oloader.setMaterials(materials);
-		texture = await new TextureLoader().loadAsync(
-			"https://i.imgur.com/aNVFzZX.jpg"
+		var img = new THREE.ImageLoader().loadAsync(
+			"https://i.imgur.com/uyrLZpB.jpg"
+		);
+				texture = await new TextureLoader().loadAsync(
+			"https://i.imgur.com/uyrLZpB.jpg"
 		);
 		Model = await oloader.loadAsync(MODELS[currentMod]);
-
+		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+		
 		Model.traverse(function (child) {
 			console.log(child.name);
-			if (child instanceof THREE.Mesh) {
-				child.material = new THREE.MeshPhongMaterial();
-
-				child.material.map = texture;
+			if (child.name=="Image_Circle.002" && child instanceof THREE.Mesh) {
+				var size = new Vector3()
+				var boundingBox = new THREE.Box3().setFromObject(child)
+				boundingBox.getSize(size);
+				console.log(size);
+				var dimx = Math.abs(boundingBox.min.x - boundingBox.max.x)
+				var dimy = Math.abs(boundingBox.min.y - boundingBox.max.y)
+				var dimz = Math.abs(boundingBox.min.z - boundingBox.max.z)
+				console.log(dimx,dimy,dimz);
+				console.log((texture.image.height/dimx)/1000)
+				console.log(texture.image.height,dimz)
+				console.log(dimz/texture.image.height)
+				texture.repeat.set(2.1, 3.6);
+				child.material = new THREE.MeshPhongMaterial({map:texture});
 				child.material.envMap = texturess;
 				child.material.combine = THREE.MixOperation;
 				child.material.reflectivity = 0.0;
 				child.material.shininess = 0;
+				console.log(child.geometry)
+			}
+			else if (child instanceof THREE.Mesh){
+				child.material = new THREE.MeshPhongMaterial({color:new THREE.Color(0xFF0000)});;
+				child.material.envMap = texturess;
+				child.material.combine = THREE.MixOperation;
+				child.material.reflectivity = 0.01;
+				child.material.shininess = 60;
 			}
 		});
 
@@ -85,8 +110,7 @@ export const TestComponent = () => {
 
 		return [Model, materials];
 	};
-	const changeModel: React.MouseEventHandler<HTMLButtonElement> =
-		async () => {
+	const changeModel : React.MouseEventHandler<HTMLButtonElement> = () => {
 			console.log(MODELS[currentMod]);
 
 			scene.remove(Model);

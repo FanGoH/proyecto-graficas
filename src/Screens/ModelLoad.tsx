@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import useWindowSize from "../Hooks/useWindowSize";
+import { SAMPLES } from "./SAMPLES";
 
 export const TestComponent = () => {
 	const divToMount = useRef<HTMLDivElement>(null);
@@ -63,6 +64,11 @@ export const TestComponent = () => {
 		controls.update();
 		scene.background = new THREE.Color("white");
 
+		const geometry = new THREE.BoxGeometry(1, 1, 1);
+		
+		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+		const cube = new THREE.Mesh(geometry, material);
+		scene.add(cube	);
 		camera.position.z = 5;
 		const animate = () => {
 			requestAnimationFrame(animate);

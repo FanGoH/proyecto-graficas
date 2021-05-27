@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { ClampToEdgeWrapping, ImageLoader, MeshPhongMaterial, Scene, TextureLoader } from "three";
+import {
+	ClampToEdgeWrapping,
+	ImageLoader,
+	MeshPhongMaterial,
+	Scene,
+	TextureLoader,
+} from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import useWindowSize from "../Hooks/useWindowSize";
 import { SAMPLES } from "./SAMPLES";
-import {MODELS} from "./MODELS"
+import { MODELS } from "./MODELS";
 
 export const TestComponent = () => {
 	const divToMount = useRef<HTMLDivElement>(null);
@@ -16,19 +22,17 @@ export const TestComponent = () => {
 	const [width, height] = useWindowSize(140);
 	const [color, setColor] = useState("");
 	const scene = new THREE.Scene();
-	let Model:THREE.Group
+	let Model: THREE.Group;
 	const oloader = new OBJLoader();
 	const mtlLoad = new MTLLoader();
 	var texture: THREE.Texture;
-	var texturess:THREE.Texture;
-	const [currentFace, setCurrentFace] = useState<keyof typeof SAMPLES>(
-		"lego"
-	);
+	var texturess: THREE.Texture;
+	const [currentFace, setCurrentFace] =
+		useState<keyof typeof SAMPLES>("lego");
 
-	const [currentMod, setCurrentModel] = useState<keyof typeof MODELS>(
-		"bottle"
-	);
-	
+	const [currentMod, setCurrentModel] =
+		useState<keyof typeof MODELS>("bottle");
+
 	var currentMesh: MeshPhongMaterial;
 	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
 		setColor(e.target.value);
@@ -52,68 +56,61 @@ export const TestComponent = () => {
 		console.log(Model);
 	};
 	const loadModel = async () => {
-			
-
 		const materials = await mtlLoad.loadAsync(
 			`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.mtl`
 		);
 
-
 		materials.preload();
 
 		//oloader.setMaterials(materials);
-		 texture = await new TextureLoader().loadAsync("https://i.imgur.com/aNVFzZX.jpg")
-		Model = (await oloader.loadAsync(MODELS[currentMod]))
-		
-			Model.traverse(function ( child ) {
-				console.log(child.name)
-				if (   child instanceof THREE.Mesh ) {
-					child.material = new THREE.MeshPhongMaterial();
-					
-					child.material.map = texture;
-					child.material.envMap = texturess;
-					child.material.combine = THREE.MixOperation;
-					child.material.reflectivity = 0.0;
-					child.material.shininess = 0;
-					
+		texture = await new TextureLoader().loadAsync(
+			"https://i.imgur.com/aNVFzZX.jpg"
+		);
+		Model = await oloader.loadAsync(MODELS[currentMod]);
 
-			
-				}
-			
-			} );
-		 
-		
-		
-		scene.add(Model );
+		Model.traverse(function (child) {
+			console.log(child.name);
+			if (child instanceof THREE.Mesh) {
+				child.material = new THREE.MeshPhongMaterial();
+
+				child.material.map = texture;
+				child.material.envMap = texturess;
+				child.material.combine = THREE.MixOperation;
+				child.material.reflectivity = 0.0;
+				child.material.shininess = 0;
+			}
+		});
+
+		scene.add(Model);
 
 		return [Model, materials];
 	};
-	const changeModel: React.MouseEventHandler<HTMLButtonElement> = async() => {
-		console.log(MODELS[currentMod]);
-		
-		scene.remove(Model);
-		loadModel();
-		
-	};
+	const changeModel: React.MouseEventHandler<HTMLButtonElement> =
+		async () => {
+			console.log(MODELS[currentMod]);
+
+			scene.remove(Model);
+			loadModel();
+		};
 	useEffect(() => {
 		if (divToMount.current === null) {
 			return;
 		}
 		// === THREE.JS CODE START ===
-		
+
 		const loader = new THREE.CubeTextureLoader();
-		 texturess = loader.load([
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg',
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg',
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg',
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-y.jpg',
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-z.jpg',
-			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-z.jpg',
-		  ]);
+		texturess = loader.load([
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg",
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg",
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg",
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-y.jpg",
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-z.jpg",
+			"https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-z.jpg",
+		]);
 		scene.background = texturess;
-		  console.log(scene.background);
+		console.log(scene.background);
 		//esto lo acababa de ponder so, me di cuenta
-		
+
 		const camera = new THREE.PerspectiveCamera(
 			75,
 			window.innerWidth / window.innerHeight,
@@ -125,7 +122,7 @@ export const TestComponent = () => {
 
 		{
 			const skyColor = 0xb1e1ff;
-			const ground = 0xFF5733;
+			const ground = 0xff5733;
 			const intensity = 1.3;
 
 			const light = new THREE.HemisphereLight(
@@ -177,7 +174,7 @@ export const TestComponent = () => {
 		for (let i = 0; i < 6; i++) {
 			const img = new Image();
 			img.src = `${process.env.PUBLIC_URL}/image/lego.jpg`;
-			 tex = new THREE.TextureLoader().load(img.src);
+			tex = new THREE.TextureLoader().load(img.src);
 
 			const mat = new THREE.MeshBasicMaterial({
 				...(i !== 4 && { color: 0xffffff }),
@@ -186,37 +183,32 @@ export const TestComponent = () => {
 			materials.push(mat);
 		}
 		renderer.physicallyCorrectLights = true;
-		const sgeometry = new THREE.SphereGeometry(1,60,60);
+		const sgeometry = new THREE.SphereGeometry(1, 60, 60);
 		currentMesh = new THREE.MeshPhongMaterial();
-		
-		
+
 		currentMesh.envMap = texturess;
 		currentMesh.combine = THREE.MixOperation;
 		currentMesh.reflectivity = 0.1;
 		currentMesh.shininess = 0;
-	
-		currentMesh.map = new TextureLoader().load(SAMPLES['lego'])
-		
+
+		currentMesh.map = new TextureLoader().load(SAMPLES["lego"]);
 
 		const cube = new THREE.Mesh(sgeometry, currentMesh);
 		cube.rotation.set(0.5, 0.4, 0);
 		cubeRef.current = cube;
-		
-		renderer.setClearColor(0xFFFFFF,0);
+
+		renderer.setClearColor(0xffffff, 0);
 		//console.log(cube)
 		//scene.add(cube);
-	//	scene.background = new THREE.Color("white");
+		//	scene.background = new THREE.Color("white");
 		camera.position.z = 5;
 		const animate = () => {
 			requestAnimationFrame(animate);
 			// cube.rotation.x += 0.01;
 			// cube.rotation.y += 0.01;
 			renderer.render(scene, camera);
-			
 		};
 		animate();
-		
-		
 
 		loadModel();
 
@@ -244,10 +236,7 @@ export const TestComponent = () => {
 				))}
 			</select>
 			<button onClick={changeFace}>Commit model change</button>
-<<<<<<< HEAD
 			<div ref={divToMount} />
-=======
-
 			<select
 				onChange={(e) => {
 					setCurrentModel(e.target.value as keyof typeof MODELS);
@@ -255,10 +244,8 @@ export const TestComponent = () => {
 				{Object.keys(MODELS).map((key) => (
 					<option key={key}>{key}</option>
 				))}
-				
 			</select>
 			<button onClick={changeModel}>Commit Model</button>
->>>>>>> 5e6856fffac3c8cb9d91910d197360c2a38af5e9
 		</>
 	);
 };

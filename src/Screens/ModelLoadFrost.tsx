@@ -5,6 +5,7 @@ import {
 	ImageLoader,
 	MeshPhongMaterial,
 	TextureLoader,
+	Vector3,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
@@ -24,7 +25,7 @@ export const TestComponent = () => {
 	const cubeRef = useRef<THREE.Mesh<any, any> | null>(null);
 
 	const threeRefs = useThreeJSRefs(140);
-	const { cameraRef, height, renderer, scene, width } = threeRefs;
+	const { cameraRef, renderer, scene } = threeRefs;
 
 	const [color, setColor] = useState("");
 	const oloader = new OBJLoader();
@@ -36,7 +37,7 @@ export const TestComponent = () => {
 	// 	useState<keyof typeof SAMPLES>("lego");
 
 	const [currentMod, setCurrentModel] =
-		useState<keyof typeof MODELS>("bottle");
+		useState<keyof typeof MODELS>("botellaChida");
 
 	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
 		setColor(e.target.value);
@@ -67,21 +68,47 @@ export const TestComponent = () => {
 		materials.preload();
 
 		//oloader.setMaterials(materials);
-		texture = await new TextureLoader().loadAsync(
-			"https://i.imgur.com/aNVFzZX.jpg"
+		var img = new THREE.ImageLoader().loadAsync(
+			"https://i.imgur.com/uyrLZpB.jpg"
 		);
-		Model = await oloader.loadAsync(MODELS["pillow"]);
+		texture = await new TextureLoader().loadAsync(
+			"https://i.imgur.com/uyrLZpB.jpg"
+		);
+		Model = await oloader.loadAsync(MODELS[currentMod]);
+		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 		Model.traverse(function (child) {
-			//console.log(child.name);
-			if (child instanceof THREE.Mesh) {
-				child.material = new THREE.MeshPhongMaterial();
-
-				child.material.map = texture;
+			console.log(child.name);
+			if (
+				child.name === "Image_Circle.002" &&
+				child instanceof THREE.Mesh
+			) {
+				var size = new Vector3();
+				var boundingBox = new THREE.Box3().setFromObject(child);
+				boundingBox.getSize(size);
+				console.log(size);
+				var dimx = Math.abs(boundingBox.min.x - boundingBox.max.x);
+				var dimy = Math.abs(boundingBox.min.y - boundingBox.max.y);
+				var dimz = Math.abs(boundingBox.min.z - boundingBox.max.z);
+				console.log(dimx, dimy, dimz);
+				console.log(texture.image.height / dimx / 1000);
+				console.log(texture.image.height, dimz);
+				console.log(dimz / texture.image.height);
+				texture.repeat.set(2.1, 3.6);
+				child.material = new THREE.MeshPhongMaterial({ map: texture });
 				child.material.envMap = texturess;
 				child.material.combine = THREE.MixOperation;
 				child.material.reflectivity = 0.0;
 				child.material.shininess = 0;
+				console.log(child.geometry);
+			} else if (child instanceof THREE.Mesh) {
+				child.material = new THREE.MeshPhongMaterial({
+					color: new THREE.Color(0xff0000),
+				});
+				child.material.envMap = texturess;
+				child.material.combine = THREE.MixOperation;
+				child.material.reflectivity = 0.01;
+				child.material.shininess = 60;
 			}
 		});
 

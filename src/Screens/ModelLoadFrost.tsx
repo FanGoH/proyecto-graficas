@@ -131,6 +131,7 @@ export const TestComponent = () => {
 		cubeRef.current = cube;
 
 		scene.add(cube);
+		scene.background = new THREE.Color("white");
 
 		camera.position.z = 5;
 		const animate = () => {
@@ -178,7 +179,6 @@ export const TestComponent = () => {
 		<>
 			<input type='color' onInput={changingColor} /> {color}
 			<button onClick={commitColor}> Commit color</button>
-			<div ref={divToMount} />
 			<select
 				onChange={(e) => {
 					setCurrentFace(e.target.value as keyof typeof SAMPLES);
@@ -188,6 +188,7 @@ export const TestComponent = () => {
 				))}
 			</select>
 			<button onClick={changeFace}>Commit model change</button>
+			<div ref={divToMount} />
 		</>
 	);
 };

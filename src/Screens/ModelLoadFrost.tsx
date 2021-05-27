@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { ImageLoader, MeshPhongMaterial, Scene, TextureLoader } from "three";
+import { ClampToEdgeWrapping, ImageLoader, MeshPhongMaterial, Scene, TextureLoader } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import useWindowSize from "../Hooks/useWindowSize";
 import { SAMPLES } from "./SAMPLES";
+import {MODELS} from "./MODELS"
 
 export const TestComponent = () => {
 	const divToMount = useRef<HTMLDivElement>(null);
@@ -14,9 +15,18 @@ export const TestComponent = () => {
 	const [renderer] = useState<THREE.WebGLRenderer>(new THREE.WebGLRenderer());
 	const [width, height] = useWindowSize(140);
 	const [color, setColor] = useState("");
-
+	const scene = new THREE.Scene();
+	let Model:THREE.Group
+	const oloader = new OBJLoader();
+	const mtlLoad = new MTLLoader();
+	var texture: THREE.Texture;
+	var texturess:THREE.Texture;
 	const [currentFace, setCurrentFace] = useState<keyof typeof SAMPLES>(
 		"lego"
+	);
+
+	const [currentMod, setCurrentModel] = useState<keyof typeof MODELS>(
+		"bottle"
 	);
 	
 	var currentMesh: MeshPhongMaterial;
@@ -39,28 +49,60 @@ export const TestComponent = () => {
 	};
 
 	const changeFace: React.MouseEventHandler<HTMLButtonElement> = () => {
-		if (cubeRef.current!.material.length) {
-			cubeRef.current!.material[4].map = new THREE.TextureLoader().load(
-				SAMPLES[currentFace]
-			);
-		} else {
+		console.log(Model);
+	};
+	const loadModel = async () => {
 			
-			var material =new THREE.TextureLoader().load(SAMPLES[currentFace]);
+
+		const materials = await mtlLoad.loadAsync(
+			`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.mtl`
+		);
+
+
+		materials.preload();
+
+		//oloader.setMaterials(materials);
+		 texture = await new TextureLoader().loadAsync("https://i.imgur.com/aNVFzZX.jpg")
+		Model = (await oloader.loadAsync(MODELS[currentMod]))
+		
+			Model.traverse(function ( child ) {
+				console.log(child.name)
+				if (   child instanceof THREE.Mesh ) {
+					child.material = new THREE.MeshPhongMaterial();
+					
+					child.material.map = texture;
+					child.material.envMap = texturess;
+					child.material.combine = THREE.MixOperation;
+					child.material.reflectivity = 0.0;
+					child.material.shininess = 0;
+					
 
 			
-			cubeRef.current!.material.map = material;
+				}
 			
-		}
+			} );
+		 
+		
+		
+		scene.add(Model );
+
+		return [Model, materials];
 	};
-	
+	const changeModel: React.MouseEventHandler<HTMLButtonElement> = async() => {
+		console.log(MODELS[currentMod]);
+		
+		scene.remove(Model);
+		loadModel();
+		
+	};
 	useEffect(() => {
 		if (divToMount.current === null) {
 			return;
 		}
 		// === THREE.JS CODE START ===
-		const scene = new THREE.Scene();
+		
 		const loader = new THREE.CubeTextureLoader();
-		const texturess = loader.load([
+		 texturess = loader.load([
 			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg',
 			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg',
 			'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg',
@@ -97,7 +139,7 @@ export const TestComponent = () => {
 
 		{
 			const COLOR = 0xb1e1ff;
-			const intsnity = 20;
+			const intsnity = 2;
 			const light = new THREE.DirectionalLight(COLOR, intsnity);
 			light.position.set(0, 10, 0);
 			light.target.position.set(-5, 0, 0);
@@ -146,7 +188,7 @@ export const TestComponent = () => {
 		renderer.physicallyCorrectLights = true;
 		const sgeometry = new THREE.SphereGeometry(1,60,60);
 		currentMesh = new THREE.MeshPhongMaterial();
-		var envgen =new THREE.PMREMGenerator(renderer);
+		
 		
 		currentMesh.envMap = texturess;
 		currentMesh.combine = THREE.MixOperation;
@@ -161,8 +203,8 @@ export const TestComponent = () => {
 		cubeRef.current = cube;
 		
 		renderer.setClearColor(0xFFFFFF,0);
-		console.log(cube)
-		scene.add(cube);
+		//console.log(cube)
+		//scene.add(cube);
 	//	scene.background = new THREE.Color("white");
 		camera.position.z = 5;
 		const animate = () => {
@@ -174,39 +216,7 @@ export const TestComponent = () => {
 		};
 		animate();
 		
-		const loadModel = async () => {
-			var oloader = new OBJLoader();
-			const mtlLoad = new MTLLoader();
-
-			const materials = await mtlLoad.loadAsync(
-				`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.mtl`
-			);
-
-
-			materials.preload();
-
-			//oloader.setMaterials(materials);
-			var  texture = await new TextureLoader().loadAsync("https://d500.epimg.net/cincodias/imagenes/2018/11/13/lifestyle/1542113135_776401_1542116070_noticia_normal.jpg")
-			const FROSTMODEL = (await oloader.loadAsync(
-				`https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/kurikiribocho.obj`))
-			
-				FROSTMODEL.traverse(function ( child ) {
-
-					if ( child instanceof THREE.Mesh ) {
-				
-						child.material.map = texture;
-						child.material.envMap = texturess;
-				
-					}
-				
-				} );
-			 
-			FROSTMODEL.scale.set(0.2,0.2,0.2);
-			
-			scene.add(FROSTMODEL );
-
-			return [FROSTMODEL, materials];
-		};
+		
 
 		loadModel();
 
@@ -235,6 +245,17 @@ export const TestComponent = () => {
 				))}
 			</select>
 			<button onClick={changeFace}>Commit model change</button>
+
+			<select
+				onChange={(e) => {
+					setCurrentModel(e.target.value as keyof typeof MODELS);
+				}}>
+				{Object.keys(MODELS).map((key) => (
+					<option key={key}>{key}</option>
+				))}
+				
+			</select>
+			<button onClick={changeModel}>Commit Model</button>
 		</>
 	);
 };

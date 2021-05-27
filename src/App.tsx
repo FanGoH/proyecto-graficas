@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import { TestComponent as Customization } from "./Screens/ModelLoadFrost";
-import { TestComponent as Model } from "./Screens/ModelLoad";
+import { TestComponent as Model } from "./Screens/ModelLoad2";
 
 function App() {
 	const [model, setModel] = useState(0);

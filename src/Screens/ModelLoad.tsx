@@ -62,13 +62,13 @@ export const TestComponent = () => {
 		controls.target.set(0, 0, 0);
 
 		controls.update();
-		scene.background = new THREE.Color("white");
+		//scene.background = new THREE.Color("white");
 
 		const geometry = new THREE.BoxGeometry(1, 1, 1);
-		
-		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+		const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
 		const cube = new THREE.Mesh(geometry, material);
-		scene.add(cube	);
+		scene.add(cube);
 		camera.position.z = 5;
 		const animate = () => {
 			requestAnimationFrame(animate);
@@ -97,7 +97,7 @@ export const TestComponent = () => {
 		};
 
 		loadModel();
-		camera.zoom = 20;
+		camera.zoom = 3;
 		controls.update();
 
 		///		=== THREE.JS EXAMPLE CODE END ===

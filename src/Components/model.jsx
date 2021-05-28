@@ -30,7 +30,10 @@ export default function Model() {
     const [background, setBackground] = useState(null)
     const [modelId, setModelId] = useState(Object.keys(MODELS)[0])
     const [colorId, setColorId] = useState(Object.keys(COLORS)[0])
+    const [secondaryColorId, setSecondaryColorId] = useState(Object.keys(COLORS)[0])
+    const [textureURL, setTextureURL] = useState("https://i.imgur.com/dn7WVR6.jpeg")
     const [textureId, setTextureId] = useState(TEXTURES[Object.keys(TEXTURES)[0]])
+    const [secondaryTextureId, setSecondaryTextureId] = useState(TEXTURES[Object.keys(TEXTURES)[0]])
     const [materialId, setMaterialId] = useState(Object.keys(MATERIALS)[0])
 
     useEffect(async() => {
@@ -50,36 +53,55 @@ export default function Model() {
     useEffect(async () => {
         if (bg.current === null)
             bg.current = await loadCubeTex(BACKGROUNDS[background])
-        model.current = updateScene(scene.current, model.current, modelId, materialId, textureId, bg.current, colorId)
-    }, [modelId, colorId, textureId])
+        model.current = updateScene(scene.current, model.current, modelId, materialId, [textureURL, ...textureId, ...secondaryTextureId], bg.current, colorId, secondaryColorId)
+    }, [modelId, colorId, textureId, textureURL, secondaryColorId, secondaryTextureId])
 
     return (
         <>  
-            <select onChange={(e) => setBackground(e.target.value)}>
+            Fondo: <select onChange={(e) => setBackground(e.target.value)}>
                 {Object.keys(BACKGROUNDS).map((key) => (
 					<option key={key} value={key}>
 						{key}
 					</option>
 				))}
             </select>
-            <select onChange={(e) => setModelId(e.target.value)}>
+            Modelo: <select onChange={(e) => setModelId(e.target.value)}>
                 {Object.keys(MODELS).map((key) => (
 					<option key={key} value={key}>
 						{key}
 					</option>
 				))}
             </select>
-            <select onChange={(e) => setColorId(e.target.value)}>
+            Color primario: <select onChange={(e) => setColorId(e.target.value)}>
                 {COLORS.map((v) => (
 					<option key={v} value={v}>
 						{v}
 					</option>
 				))}
             </select>
-            <input type="text" name="" id="" onChange={(e) => setTextureId([e.target.value])} placeholder="Ingrese la url de la imagen personalziada"/>
+            Color secundario: <select onChange={(e) => setSecondaryColorId(e.target.value)}>
+                {COLORS.map((v) => (
+					<option key={v+"1"} value={v}>
+						{v}
+					</option>
+				))}
+            </select>
+            Textura: <select onChange={(e) => setTextureId(TEXTURES[e.target.value])}>
+                {Object.keys(TEXTURES).map((key) => (
+					<option key={key} value={key}>
+						{key}
+					</option>
+				))}
+            </select>
+            Textura Secundaria: <select onChange={(e) => setSecondaryTextureId(TEXTURES[e.target.value])}>
+                {Object.keys(TEXTURES).map((key) => (
+					<option key={key+"1"} value={key}>
+						{key}
+					</option>
+				))}
+            </select>
+            Imagen primaria: <input type="text" name="" id="" onChange={(e) => setTextureURL([e.target.value])} placeholder="Ingrese la url de la imagen personalziada"/>
             <div ref={canvasDiv}></div>
         </>
     )
 }
-
-// https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Muelle/negx.png?raw=true

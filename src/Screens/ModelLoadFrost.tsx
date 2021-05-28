@@ -18,7 +18,11 @@ import { SAMPLES } from "./SAMPLES";
 import { MODELS } from "./MODELS";
 
 
-export const TestComponent = () => {
+export const TestComponent = ({
+	modelName,
+}: {
+	modelName: keyof typeof MODELS;
+}) => {
 	const divToMount = useRef<HTMLDivElement>(null);
 	const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 	const cubeRef = useRef<THREE.Mesh<any, any> | null>(null);
@@ -36,12 +40,20 @@ export const TestComponent = () => {
 		useState<keyof typeof SAMPLES>("lego");
 
 	const [currentMod, setCurrentModel] =
-		useState<keyof typeof MODELS>("Hoodie");
+		useState<keyof typeof MODELS>("hoodie");
 
 	var currentMesh: MeshPhongMaterial;
 	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
 		setColor(e.target.value);
 	};
+
+	// const commitColor: React.MouseEventHandler<HTMLButtonElement> = () => {
+	// 	if (cubeRef.current!.material.length) {
+	// 		cubeRef.current!.material.forEach((mat: any, idx: number) => {
+	// 			if (idx === 4) {
+	// 				return;
+	// 			}
+	// 		};
 
 	const commitColor: React.MouseEventHandler<HTMLButtonElement> = () => {
 		if (cubeRef.current!.material.length) {
@@ -72,7 +84,7 @@ export const TestComponent = () => {
 				texture = await new TextureLoader().loadAsync(
 			"https://i.imgur.com/uyrLZpB.jpg"
 		);
-		Model = await oloader.loadAsync(MODELS[currentMod]);
+		Model = await oloader.loadAsync(MODELS[modelName]);
 		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 		
 		Model.traverse(function (child) {
@@ -110,6 +122,8 @@ export const TestComponent = () => {
 			return;
 		}
 		// === THREE.JS CODE START ===
+
+		
 
 		const loader = new THREE.CubeTextureLoader();
 		texturess = loader.load([
@@ -225,6 +239,8 @@ export const TestComponent = () => {
 
 		loadModel();
 
+		controls.update();
+
 		// === THREE.JS EXAMPLE CODE END ===
 	}, [renderer]);
 
@@ -250,15 +266,6 @@ export const TestComponent = () => {
 			</select>
 			<button onClick={changeFace}>Commit model change</button>
 			<div ref={divToMount} />
-			<select
-				onChange={(e) => {
-					setCurrentModel(e.target.value as keyof typeof MODELS);
-				}}>
-				{Object.keys(MODELS).map((key) => (
-					<option key={key}>{key}</option>
-				))}
-			</select>
-			<button onClick={changeModel}>Commit Model</button>
 		</>
 	);
 };

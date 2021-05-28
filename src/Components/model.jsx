@@ -10,17 +10,20 @@ import { TEXTURES } from '../DataSources/textures';
 import { loadTex } from '../Helpers/ModelHandlers/loadTex';
 import { loadCubeTex } from '../Helpers/ModelHandlers/loadCubeTex';
 import { updateScene } from '../Helpers/ModelHandlers/updateScene';
-import { loadModel } from '../Helpers/ModelHandlers/loadModel';
 import { MODELS } from '../DataSources/models';
 import { MATERIALS } from '../DataSources/materials';
 import { BACKGROUNDS } from '../DataSources/backgrounds';
 import { COLORS } from '../DataSources/colors';
+
+const MOV_DELTA = 1
 
 export default function Model() {
     const canvasDiv = useRef(null)
     const controls = useRef(null)
     const model = useRef(null)
     const bg = useRef(null)
+    const hemisphereLight = useRef(null)
+    const directionalLight = useRef(null)
 
     const renderer = useRef(new three.WebGLRenderer())
     const scene = useRef(new three.Scene())
@@ -36,28 +39,37 @@ export default function Model() {
     const [secondaryTextureId, setSecondaryTextureId] = useState(TEXTURES[Object.keys(TEXTURES)[0]])
     const [materialId, setMaterialId] = useState(Object.keys(MATERIALS)[0])
 
+
     useEffect(async() => {
-        setupScene(scene.current)
+        [hemisphereLight.current, directionalLight.current] = setupScene(scene.current)
         canvasDiv.current.appendChild(renderer.current.domElement)
         controls.current = setupControls(camera.current, canvasDiv.current)
         setupRenderer(renderer.current, scene.current, camera.current)
         bg.current = await loadCubeTex(BACKGROUNDS[background])
         setBackground(Object.keys(BACKGROUNDS)[0])
+        console.log(directionalLight)
     }, [])
 
     useEffect(async () => {
         bg.current = await loadCubeTex(BACKGROUNDS[background])
+        
         scene.current.background=bg.current
     }, [background])
 
     useEffect(async () => {
         if (bg.current === null)
             bg.current = await loadCubeTex(BACKGROUNDS[background])
-        model.current = updateScene(scene.current, model.current, modelId, materialId, [textureURL, ...textureId, ...secondaryTextureId], bg.current, colorId, secondaryColorId)
+        model.current = updateScene(
+            scene.current, 
+            model.current, 
+            modelId, materialId, 
+            [textureURL, ...textureId, ...secondaryTextureId], 
+            bg.current, colorId, secondaryColorId
+        )
     }, [modelId, colorId, textureId, textureURL, secondaryColorId, secondaryTextureId])
-
+  
     return (
-        <>  
+        <>  <div>
             Fondo: <select onChange={(e) => setBackground(e.target.value)}>
                 {Object.keys(BACKGROUNDS).map((key) => (
 					<option key={key} value={key}>
@@ -65,6 +77,8 @@ export default function Model() {
 					</option>
 				))}
             </select>
+            </div>
+            <div>
             Modelo: <select onChange={(e) => setModelId(e.target.value)}>
                 {Object.keys(MODELS).map((key) => (
 					<option key={key} value={key}>
@@ -72,16 +86,11 @@ export default function Model() {
 					</option>
 				))}
             </select>
+            </div>
+            <div>
             Color primario: <select onChange={(e) => setColorId(e.target.value)}>
                 {COLORS.map((v) => (
 					<option key={v} value={v}>
-						{v}
-					</option>
-				))}
-            </select>
-            Color secundario: <select onChange={(e) => setSecondaryColorId(e.target.value)}>
-                {COLORS.map((v) => (
-					<option key={v+"1"} value={v}>
 						{v}
 					</option>
 				))}
@@ -93,6 +102,16 @@ export default function Model() {
 					</option>
 				))}
             </select>
+            </div>
+            <div>
+            Color secundario: <select onChange={(e) => setSecondaryColorId(e.target.value)}>
+                {COLORS.map((v) => (
+					<option key={v+"1"} value={v}>
+						{v}
+					</option>
+				))}
+            </select>
+           
             Textura Secundaria: <select onChange={(e) => setSecondaryTextureId(TEXTURES[e.target.value])}>
                 {Object.keys(TEXTURES).map((key) => (
 					<option key={key+"1"} value={key}>
@@ -100,8 +119,24 @@ export default function Model() {
 					</option>
 				))}
             </select>
-            Imagen primaria: <input type="text" name="" id="" onChange={(e) => setTextureURL([e.target.value])} placeholder="Ingrese la url de la imagen personalziada"/>
+            </div>
+            <div>
+            Imagen primaria: <input type="text" name="" id="" onChange={(e) => setTextureURL(e.target.value)} placeholder="Ingrese la url de la imagen personalziada"/>
+            </div>
+            <div>            Color Luz: <select onChange={(e) => {directionalLight.current.color = new three.Color(e.target.value)}}>
+                {COLORS.map((v) => (
+					<option key={v+"1"} value={v}>
+						{v}
+					</option>
+				))}
+            </select>
+            Intensidad: 0 <input id="inc"  type="range" class="rs-range" min="0" max="5" step="0.1" value="1"  onChange={(e)=> {directionalLight.current.intensity = e.target.value} }/> 3
+            
             <div ref={canvasDiv}></div>
+
+            Mover luz: <button onClick={()=>{directionalLight.current.position.x+=MOV_DELTA}}>+x</button><button onClick={()=>{directionalLight.current.position.x-=MOV_DELTA}}>-x</button>
+            <button onClick={()=>{directionalLight.current.position.y+=MOV_DELTA}}>+y</button><button onClick={()=>{directionalLight.current.position.y-=MOV_DELTA}}>-y</button>
+            <button onClick={()=>{directionalLight.current.position.z+=MOV_DELTA}}>+z</button><button onClick={()=>{directionalLight.current.position.z-=MOV_DELTA}}>-z</button>
         </>
     )
 }

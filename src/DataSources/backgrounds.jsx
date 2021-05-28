@@ -48,12 +48,12 @@ export const BACKGROUNDS = {
         "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/atardecer/negz.png",
     ],
     selva: [
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/posx.png",
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/negx.png",
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/posy.png",
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/negy.png",
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/posz.png",
-        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/selva/negz.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/posx.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/negx.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/posy.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/negy.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/posz.png",
+        "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Selva/negz.png",
     ],
     estudio: [
         "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/BG/Studio/posx.png",

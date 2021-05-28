@@ -3,6 +3,6 @@ import { hemisphereLight } from "../hemisphereLight"
 
 
 export const setupScene = (scene) => {
-    hemisphereLight(scene)
-    directionalLight(scene)
+    return [hemisphereLight(scene),
+    directionalLight(scene)]
 }

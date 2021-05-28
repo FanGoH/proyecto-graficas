@@ -8,9 +8,9 @@ export const loadModel = async (bg, modeldata, texture, material, color="blue", 
 
     // if (mat !== undefined)
     //     mat.preload()
-    console.log(color)
+   
     const [primaryTexture, secondaryTexture, ternaryTexture] = tex
-    const primarySections = ["Hat","sleeve_cuffs","bottom_cuff","Bag","FrontViewPad","ImageSr","rope1","rope2"]
+    const primarySections = ["Hat","sleeve_cuffs","bottom_cuff","Bag","FrontViewPad","ImageSr","rope1","rope2","BottleCap"]
     primaryTexture.wrapS = primaryTexture.wrapT = three.RepeatWrapping
 
     model.traverse(async (c) => {
@@ -21,7 +21,7 @@ export const loadModel = async (bg, modeldata, texture, material, color="blue", 
                 c.material = new three.MeshPhongMaterial({
                     map: primaryTexture,    
                 });
-                c.material.envMap =bg;
+                c.material.envMap=bg;
                 c.material.combine = three.MixOperation;
                 c.material.reflectivity = modeldata.props.primaryReflectivity;
                 c.material.shininess = modeldata.props.primaryShininess;
@@ -30,11 +30,12 @@ export const loadModel = async (bg, modeldata, texture, material, color="blue", 
                 c.material = new three.MeshPhongMaterial({
                     color: new three.Color(color),
                     map: secondaryTexture,
+                   
                 });
                 c.material.envMap =bg;
                 c.material.combine = three.MixOperation;
-                c.material.reflectivity = modeldata.props.secondaryReflectivity;
-                c.material.shininess = modeldata.props.secondaryShininess;
+                c.material.reflectivity =modeldata.props.primaryReflectivity;
+                c.material.shininess = modeldata.props.primaryShininess;
             } else   {
                 c.material = new three.MeshPhongMaterial({
                     color: new three.Color(secondaryColor),

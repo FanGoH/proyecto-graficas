@@ -2,9 +2,9 @@ export const MODELS = {
 	mousepad: {
 		src: "https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mousepadChido.obj",
 		props: {
-			primaryReflectivity: 0.05,
+			primaryReflectivity: 0.02,
 			primaryShininess: 0.1,
-			secondaryReflectivity: 0.05,
+			secondaryReflectivity: 0.02,
 			secondaryShininess: 0.1,
 		}
 	},

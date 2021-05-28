@@ -131,12 +131,14 @@ export default function Model() {
 				))}
             </select>
             Intensidad: 0 <input id="inc"  type="range" class="rs-range" min="0" max="5" step="0.1" value="1"  onChange={(e)=> {directionalLight.current.intensity = e.target.value} }/> 3
-            
-            <div ref={canvasDiv}></div>
+            </div>
 
+            <div ref={canvasDiv}></div>
+            <div>
             Mover luz: <button onClick={()=>{directionalLight.current.position.x+=MOV_DELTA}}>+x</button><button onClick={()=>{directionalLight.current.position.x-=MOV_DELTA}}>-x</button>
             <button onClick={()=>{directionalLight.current.position.y+=MOV_DELTA}}>+y</button><button onClick={()=>{directionalLight.current.position.y-=MOV_DELTA}}>-y</button>
             <button onClick={()=>{directionalLight.current.position.z+=MOV_DELTA}}>+z</button><button onClick={()=>{directionalLight.current.position.z-=MOV_DELTA}}>-z</button>
+            </div>
         </>
     )
 }

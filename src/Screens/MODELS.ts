@@ -18,5 +18,9 @@ export const MODELS = {
 	pad:
 	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mouse_pad.obj",
 	botellaChida:
-	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/Plastic%20Water%20Bottle%20Full.obj"
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/Plastic%20Water%20Bottle%20Full.obj",
+	Hoodie:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/Hodie.obj",
+	mopad:
+	"https://raw.githubusercontent.com/ManmadeArc/GraficasYVisualizacion/main/mousepadChido.obj",
 };

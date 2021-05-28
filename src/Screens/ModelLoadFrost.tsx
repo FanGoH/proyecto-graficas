@@ -20,14 +20,18 @@ import {
 	useResizableRenderer,
 } from "../ThreeFuncs/modelLoadInits";
 
-export const TestComponent = () => {
+export const TestComponent = ({
+	modelName,
+}: {
+	modelName: keyof typeof MODELS;
+}) => {
 	const divToMount = useRef<HTMLDivElement>(null);
 	const cubeRef = useRef<THREE.Mesh<any, any> | null>(null);
 
 	const threeRefs = useThreeJSRefs(140);
 	const { cameraRef, renderer, scene } = threeRefs;
 
-	const [color, setColor] = useState("");
+	//	const [color, setColor] = useState("");
 	const oloader = new OBJLoader();
 	const mtlLoad = new MTLLoader();
 	let Model: THREE.Group;
@@ -36,26 +40,25 @@ export const TestComponent = () => {
 	// const [currentFace, setCurrentFace] =
 	// 	useState<keyof typeof SAMPLES>("lego");
 
-	const [currentMod, setCurrentModel] =
-		useState<keyof typeof MODELS>("botellaChida");
+	const [currentMod] = useState<keyof typeof MODELS>(modelName);
 
-	const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-		setColor(e.target.value);
-	};
+	// const changingColor: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+	// 	setColor(e.target.value);
+	// };
 
-	const commitColor: React.MouseEventHandler<HTMLButtonElement> = () => {
-		if (cubeRef.current!.material.length) {
-			cubeRef.current!.material.forEach((mat: any, idx: number) => {
-				if (idx === 4) {
-					return;
-				}
+	// const commitColor: React.MouseEventHandler<HTMLButtonElement> = () => {
+	// 	if (cubeRef.current!.material.length) {
+	// 		cubeRef.current!.material.forEach((mat: any, idx: number) => {
+	// 			if (idx === 4) {
+	// 				return;
+	// 			}
 
-				mat.color.set(color);
-			});
-		} else {
-			cubeRef.current!.material.color.set(color);
-		}
-	};
+	// 			mat.color.set(color);
+	// 		});
+	// 	} else {
+	// 		cubeRef.current!.material.color.set(color);
+	// 	}
+	// };
 
 	// const changeFace: React.MouseEventHandler<HTMLButtonElement> = () => {
 	// 	//console.log(Model);
@@ -74,11 +77,11 @@ export const TestComponent = () => {
 		texture = await new TextureLoader().loadAsync(
 			"https://i.imgur.com/uyrLZpB.jpg"
 		);
-		Model = await oloader.loadAsync(MODELS[currentMod]);
+		Model = await oloader.loadAsync(MODELS[modelName]);
 		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 		Model.traverse(function (child) {
-			console.log(child.name);
+			//console.log(child.name);
 			if (
 				child.name === "Image_Circle.002" &&
 				child instanceof THREE.Mesh
@@ -86,21 +89,34 @@ export const TestComponent = () => {
 				var size = new Vector3();
 				var boundingBox = new THREE.Box3().setFromObject(child);
 				boundingBox.getSize(size);
-				console.log(size);
-				var dimx = Math.abs(boundingBox.min.x - boundingBox.max.x);
-				var dimy = Math.abs(boundingBox.min.y - boundingBox.max.y);
-				var dimz = Math.abs(boundingBox.min.z - boundingBox.max.z);
-				console.log(dimx, dimy, dimz);
-				console.log(texture.image.height / dimx / 1000);
-				console.log(texture.image.height, dimz);
-				console.log(dimz / texture.image.height);
+				//console.log(size);
+				// var dimx = Math.abs(boundingBox.min.x - boundingBox.max.x);
+				// var dimy = Math.abs(boundingBox.min.y - boundingBox.max.y);
+				// var dimz = Math.abs(boundingBox.min.z - boundingBox.max.z);
+				// console.log(dimx, dimy, dimz);
+				// console.log(texture.image.height / dimx / 1000);
+				// console.log(texture.image.height, dimz);
+				// console.log(dimz / texture.image.height);
 				texture.repeat.set(2.1, 3.6);
+
 				child.material = new THREE.MeshPhongMaterial({ map: texture });
+				//	const { width, height } = child.material.map.image;
+
+				// var repeatX, repeatY;
+				// texture.wrapS = THREE.ClampToEdgeWrapping;
+				// texture.wrapT = THREE.RepeatWrapping;
+				// repeatX =
+				// 	((boundingBox.max.x - boundingBox.min.x) * height) /
+				// 	((boundingBox.max.y - boundingBox.min.y) * width);
+				// repeatY = 1;
+				// texture.repeat.set(repeatX, repeatY);
+				// texture.offset.x = ((repeatX - 1) / 2) * -1;
+
 				child.material.envMap = texturess;
 				child.material.combine = THREE.MixOperation;
 				child.material.reflectivity = 0.0;
-				child.material.shininess = 0;
-				console.log(child.geometry);
+				child.material.shininess = 0.3;
+				//console.log(child.geometry);
 			} else if (child instanceof THREE.Mesh) {
 				child.material = new THREE.MeshPhongMaterial({
 					color: new THREE.Color(0xff0000),
@@ -120,9 +136,9 @@ export const TestComponent = () => {
 	const changeModel: React.MouseEventHandler<HTMLButtonElement> =
 		async () => {
 			//console.log(MODELS[currentMod]);
-
-			scene.remove(Model);
-			loadModel();
+			console.log(currentMod);
+			//	scene.remove(Model);
+			//loadModel();
 		};
 
 	useEffect(() => {
@@ -130,6 +146,8 @@ export const TestComponent = () => {
 			return;
 		}
 		// === THREE.JS CODE START ===
+
+		threeRefs.scene = new THREE.Scene();
 
 		const loader = new THREE.CubeTextureLoader();
 		const texturess = loader.load([
@@ -214,6 +232,8 @@ export const TestComponent = () => {
 
 		loadModel();
 
+		controls.update();
+
 		// === THREE.JS EXAMPLE CODE END ===
 	}, [renderer]);
 
@@ -221,8 +241,8 @@ export const TestComponent = () => {
 
 	return (
 		<>
-			<input type='color' onInput={changingColor} /> {color}
-			<button onClick={commitColor}> Commit color</button>
+			{/* <input type='color' onInput={changingColor} /> {color}
+			<button onClick={commitColor}> Commit color</button> */}
 			{/* <select
 				onChange={(e) => {
 					setCurrentFace(e.target.value as keyof typeof SAMPLES);
@@ -233,15 +253,6 @@ export const TestComponent = () => {
 			</select>
 			<button onClick={changeFace}>Commit model change</button> */}
 			<div ref={divToMount} />
-			<select
-				onChange={(e) => {
-					setCurrentModel(e.target.value as keyof typeof MODELS);
-				}}>
-				{Object.keys(MODELS).map((key) => (
-					<option key={key}>{key}</option>
-				))}
-			</select>
-			<button onClick={changeModel}>Commit Model</button>
 		</>
 	);
 };
